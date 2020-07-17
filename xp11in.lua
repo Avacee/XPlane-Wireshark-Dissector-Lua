@@ -1,6 +1,6 @@
 local xp11in_info = 
 {
-    version = "1.0.0",
+    version = "1.0.1",
     author = "Avacee",
     description = "This plugin parses UDP packets inbound to X-Plane 11.",
     repository = "https://github.com/avacee/xp11-Lua-Dissector"
@@ -202,20 +202,19 @@ local function dissectCMND(buffer, pinfo, tree)
 end
 
 local function dissectDATA(buffer, pinfo, tree)
-  local subtree = tree:add(xp11in_data, buffer())
-  local packetCount = buffer:len() / 36
-  print("PacketCount = " .. packetCount)
-  for i=0, packetCount-1, 1 do
-    local d_idx = buffer(i*36,4):le_uint()
-    local branch = subtree:add(buffer(i*36,36), "ID:  " .. d_idx)
-    for j=0,7,1 do
-      local offset = (i*36) + j
+  local recordCount = buffer:len() / 36
+  local subtree = tree:add(xp11in_data, buffer()):append_text(" RecordCount = " .. recordCount)
+  for i=0, recordCount-1, 1 do
+    local index = buffer(i*36,4):le_uint()
+    local desc = xp11_DataIdLookup[index][0]
+    if desc == nil then
+      desc = "Unknown - " .. index
+    end
+    local branch = subtree:add(buffer(i*36,36), "ID:  " .. index .. "  " .. desc)
+    for j=1,8,1 do
+      local offset = (i*36) + j*4
       local d_value = buffer(offset, 4):le_float()
-      if (d_value ~= -999) then -- "-999" indicates padding / unused
-        branch:add_le(buffer(offset,4), "[" .. j .. "]:  " .. d_value)
-      else 
-        branch:add_le(buffer(offset,4), "[" .. j .. "]:")
-      end
+      branch:add_le(buffer(offset,4), "[" .. j .. "]:  " .. d_value .. "  " .. xp11_DataIdLookup[index][j])
     end
   end
 end

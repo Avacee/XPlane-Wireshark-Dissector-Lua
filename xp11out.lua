@@ -1,6 +1,6 @@
 local xp11out_info = 
 {
-    version = "1.0.0",
+    version = "1.0.1",
     author = "Avacee",
     description = "This plugin parses outbound UDP packets from X-Plane 11.",
     repository = "https://github.com/avacee/xp11-Lua-Dissector"
@@ -76,16 +76,16 @@ local function dissectDATA(buffer, pinfo, tree)
   local recordCount = buffer:len() / 36
   local subtree = tree:add(xp11out_data, buffer()):append_text(" RecordCount = " .. recordCount)
   for i=0, recordCount-1, 1 do
-    local d_idx = buffer(i*36,4):le_uint()
-    local d_str = xp11_DataIdLookup[d_idx][0]
-    if d_str == nil then
-      d_str = "Unknown - " .. d_idx
+    local index = buffer(i*36,4):le_uint()
+    local desc = xp11_DataIdLookup[index][0]
+    if desc == nil then
+      desc = "Unknown - " .. index
     end
-    local branch = subtree:add(buffer(i*36,36), "ID:  " .. d_idx .. "  " .. d_str)
+    local branch = subtree:add(buffer(i*36,36), "ID:  " .. index .. "  " .. desc)
     for j=1,8,1 do
       local offset = (i*36) + j*4
       local d_value = buffer(offset, 4):le_float()
-      branch:add_le(buffer(offset,4), "[" .. j .. "]:  " .. d_value .. "  " .. xp11_DataIdLookup[d_idx][j])
+      branch:add_le(buffer(offset,4), "[" .. j .. "]:  " .. d_value .. "  " .. xp11_DataIdLookup[index][j])
     end
   end
 end
@@ -160,5 +160,5 @@ end
 
 ut = DissectorTable.get("udp.port")
 ut:add(49001, xp11out); -- Default value - must match X-Plane->Settings->Network->UDP Ports->Port we send from (legacy)
-ut:add(49002, xp11out); -- FLIR is emitted in 49002
+ut:add(49002, xp11out); -- FLIR is emitted from 49002
 ut:add(49707, xp11out); -- BECN is multicast to 239.255.1.1:49707
