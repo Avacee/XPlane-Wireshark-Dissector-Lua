@@ -9,7 +9,7 @@ local xp11in_info =
 set_plugin_info(xp11in_info)
 
 --local d = require('debug')
-require "xplookups"
+require "xp11lookups"
 
 xp11in = Proto("xp11in","X-Plane 11 (In)")
 xp11in.fields.header= ProtoField.string("xp11in.header", "Header")
@@ -418,8 +418,8 @@ local subdissectors = {
   ISE4 = dissectISE4, -- Checked
   ISE6 = dissectISE6,
   LSND = dissectLSND, -- Doesn't play audio - bug submitted.
-  NFAL = dissectNFAL, -- Doesn't throw a wobbly but no way to check the Navaid Status.
-  NREC = dissectNREC, -- Doesn't throw a wobbly but no way to check the Navaid Status.
+  NFAL = dissectNFAL, -- Doesn't throw a wobbly but no way to check the Navaid Status when I don't know the ID<>Navaid Map.
+  NREC = dissectNREC, -- Doesn't throw a wobbly but no way to check the Navaid Status when I don't know the ID<>Navaid Map.
   OBJL = dissectOBJL, -- Checked
   OBJN = dissectOBJN, -- Checked 
   PREL = dissectPREL, -- Checked
