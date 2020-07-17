@@ -1,9 +1,9 @@
 # xp11-Lua-Dissector
 **Wireshark Dissector for X-Plane11 UDP Packets**
 
-To install simply download and copy the 4 scripts into Wireshark's "Personal Lua Plugins" folder or "Global Lua Plugins" folder.
-To locate this folder in Wireshark goto Help -> About -> Folders Tab.  
-To check if the scripts are loaded goto Help -> About -> Plugins. The Type will be "lua script"
+To install simply download and copy the 4 scripts into Wireshark's "Personal Lua Plugins" folder or "Global Lua Plugins" folder.\
+To locate this folder in Wireshark goto Help -> About -> Folders Tab.\
+To check if the scripts are loaded goto Help -> About -> Plugins. The Type will be "lua script"\
 Ctrl + Shift + L will reload Lua scripts without needing to restart.
 
 - **xp11out.lua**: This script is for the packets that X-Plane sends out. Proto's are registered as "**xp11out.packetheader.fieldname**" so "**xp11out**" or "**xp11out.$packetheader$**" can be entered as a filter.
@@ -15,8 +15,7 @@ Ctrl + Shift + L will reload Lua scripts without needing to restart.
 - **xplookups.lua**: Contains lookups for when the packet's field is an enum.
 
 
-Note1: these scripts were developed and tested on Windows only. I have no means of testing them on other OS's.
-
+Note1: these scripts were developed and tested on Windows only. I have no means of testing them on other OS's.\
 Note2: Split into 4 files simply because I was finding it annoying to keep scrolling up and down. There's no reason the code can't all be copy+pasted into one script.
 
 Todo List:
