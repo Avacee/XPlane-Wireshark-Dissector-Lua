@@ -12,9 +12,9 @@ Proto's are registered as "**xp11out.packetheader.fieldname**" so "**xp11out**" 
 - **xp11in.lua**: This script is for the packets users send to X-Plane.\
 Proto's are registered as "**xp11in.packetheader.fieldname**" so "**xp11in**" or "**xp11in.$packetheader$**" can be entered as a filter.
 
-- **xpDATAlookups.lua**: 2D Lookup table containing the descriptive names for the DATA packets. Both Headers and Fields.
+- **xp11DATAlookups.lua**: 2D Lookup table containing the descriptive names for the DATA packets. Both Headers and Fields.
 
-- **xplookups.lua**: Contains lookups for when the packet's field is an enum.
+- **xp11lookups.lua**: Contains lookups for when the packet's field is an enum.
 
 
 Note1: these scripts were developed and tested on Windows only. I have no means of testing them on other OS's.\
