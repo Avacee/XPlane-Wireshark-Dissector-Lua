@@ -84,8 +84,7 @@ local function dissectDATA(buffer, pinfo, tree)
     local branch = subtree:add(buffer(i*36,36), "ID:  " .. index .. "  " .. desc)
     for j=1,8,1 do
       local offset = (i*36) + j*4
-      local d_value = buffer(offset, 4):le_float()
-      branch:add_le(buffer(offset,4), "[" .. j .. "]:  " .. d_value .. "  " .. xp11_DataIdLookup[index][j])
+      branch:add_le(buffer(offset,4), "[" .. j .. "]:  " .. buffer(offset, 4):le_float() .. "  " .. xp11_DataIdLookup[index][j])
     end
   end
 end
