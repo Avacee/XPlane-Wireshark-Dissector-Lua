@@ -25,6 +25,7 @@ Todo List:
 - [ ] Finish detailing the DATA packet fields (about 2/3rds complete).
 - [ ] Display an upper+lower range limit in field descriptions where appropriate.
 - [ ] Front pad any appended text for a field description so it lines up nicely.
+- [ ] Add more DataRefs in the DATA field description when there's a 1-1 relationship.
 
 Wish List:
 - [ ] Recreate as one script and capture inbound RREF's / store the ID+DataRef / map it back for an outbound RREF so it can show the Dataref description.
