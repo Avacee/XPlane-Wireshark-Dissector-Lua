@@ -50,7 +50,7 @@ xp11in_data.fields.value = ProtoField.float("xp11in.data.value","Value")
 xp11in_dcoc = Proto("xp11in.dcoc", "X-Plane 11 DCOC (Enable Cockpit DATA output)")
 xp11in_dcoc.fields.id = ProtoField.int32("xp11in.dcoc.id","ID")
 
-xp11in_dref = Proto("xp11in.dref", "X-Plane 11 DREF (Set Dataref)")
+xp11in_dref = Proto("xp11in.dref", "X-Plane 11 DREF (Set DataRef)")
 xp11in_dref.fields.value = ProtoField.float("xp11in.dref.value","Value")
 xp11in_dref.fields.dataref = ProtoField.string("xp11in.dref.dataref","DataRef")
 
@@ -127,7 +127,7 @@ xp11in_reco = Proto("xp11in.rese","X-Plane 11 RESE (Reset all failed Systems)")
 xp11in_rpos = Proto("xp11in.rpos","X-Plane 11 RPOS (Request RPOS packets)")
 xp11in_rpos.fields.frequency = ProtoField.string("xp11in.rpos.frequency","Frequency")
 
-xp11in_rref = Proto("xp11in.rref", "X-Plane 11 RREF (Request/Receive Dataref/s by ID)")
+xp11in_rref = Proto("xp11in.rref", "X-Plane 11 RREF (Request/Receive DataRef/s by ID)")
 xp11in_rref.fields.id = ProtoField.float("xp11in.rref.id", "RREF ID")
 xp11in_rref.fields.value = ProtoField.float("xp11in.rref.value", "Value")
 xp11in_rref.fields.dataref = ProtoField.string("xp11in.rref.dataref","DataRef")

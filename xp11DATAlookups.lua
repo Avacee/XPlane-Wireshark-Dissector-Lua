@@ -1,6 +1,6 @@
 local xpDATAlookups_info = 
 {
-    version = "1.0.0",
+    version = "1.0.1",
     author = "Avacee",
     description = "This plugin provides a 2D lookup table for XP",
     repository = "https://github.com/avacee/xp11-Lua-Dissector"
@@ -46,7 +46,7 @@ xp11_DataIdLookup[2][6]= "" -- Unused
 xp11_DataIdLookup[2][7]= "" -- Unused
 xp11_DataIdLookup[2][8]= "" -- Unused
 
-xp11_DataIdLookup[3][0]= "Airspeed"
+xp11_DataIdLookup[3][0]= "Speeds"
 xp11_DataIdLookup[3][1]= "Knots Indicated Airspeed"
 xp11_DataIdLookup[3][2]= "Knots Equivalent Airspeed "
 xp11_DataIdLookup[3][3]= "Knots True Airspeed"
@@ -56,7 +56,7 @@ xp11_DataIdLookup[3][6]= "Indicated (mph)"
 xp11_DataIdLookup[3][7]= "True Airspeed (mph)" 
 xp11_DataIdLookup[3][8]= "True Ground Speed (mph)" 
 
-xp11_DataIdLookup[4][0]= "G loads"
+xp11_DataIdLookup[4][0]= "Mach, VVI, g-load"
 xp11_DataIdLookup[4][1]= "Current Mach"
 xp11_DataIdLookup[4][2]= "" -- Unused
 xp11_DataIdLookup[4][3]= "Vertical Velocity (feet per minute)"
@@ -96,7 +96,7 @@ xp11_DataIdLookup[7][6]= "Elec ratio"
 xp11_DataIdLookup[7][7]= "AHRS ratio" 
 xp11_DataIdLookup[7][8]= "AHRS ratio"
 
-xp11_DataIdLookup[8][0]= "Joystick Yoke1"
+xp11_DataIdLookup[8][0]= "Joystick aileron/elevator/rudder"
 xp11_DataIdLookup[8][1]= "Elevator Full down = -1 Full Up = +1"
 xp11_DataIdLookup[8][2]= "Aileron Full Left = -1  Full Right = +1"
 xp11_DataIdLookup[8][3]= "Rudder  Full Left = -1  Full Right = +1"
@@ -196,7 +196,7 @@ xp11_DataIdLookup[17][6]= "" --Unused
 xp11_DataIdLookup[17][7]= "" --Unused
 xp11_DataIdLookup[17][8]= "" --Unused
 
-xp11_DataIdLookup[18][0]= "Angle Of Attack"
+xp11_DataIdLookup[18][0]= "Angle Of Attack, sideslip, paths"
 xp11_DataIdLookup[18][1]= "Alpha - AoA (degrees)"
 xp11_DataIdLookup[18][2]= "Beta slideslip (degrees)"
 xp11_DataIdLookup[18][3]= "HPath (degrees)"
@@ -246,7 +246,7 @@ for i=0,7,1 do
   xp11_DataIdLookup[24][i+1]= "Altitude of Plane " .. i
 end
 
--- The following DATA entries have a similar description to are populated in a loop later
+-- The following DATA entries have a similar descriptions so are populated in a loop later
 xp11_DataIdLookup[25][0]= "Throttle - Requested"
 xp11_DataIdLookup[26][0]= "Throttle - Actual"
 xp11_DataIdLookup[27][0]= "Engine Mode (0=Feather, 1=Normal, 2-Beta and 3=Reverse)"

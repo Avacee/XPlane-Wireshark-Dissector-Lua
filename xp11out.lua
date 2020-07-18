@@ -28,6 +28,10 @@ xp11out_data = Proto("xp11out.data", "X-Plane 11 DATA (Data Output)")
 xp11out_data.fields.id = ProtoField.float("xp11out.data.id","ID")
 xp11out_data.fields.value = ProtoField.float("xp11out.data.value","Value")
 
+xp11out_dref = Proto("xp11out.dref", "X-Plane 11 DREF (DataRef)")
+xp11out_dref.fields.value = ProtoField.float("xp11out.dref.value","Value")
+xp11out_dref.fields.dataref = ProtoField.string("xp11out.dref.dataref","DataRef")
+
 xp11out_flir = Proto("xp11out.flir"," X-Plane 11 FLIR (FLIR Image Data)")
 xp11out_flir.fields.height = ProtoField.int16("xp11in.flir.height","Height")
 xp11out_flir.fields.width = ProtoField.int16("xp11in.flir.width","Width")
@@ -56,7 +60,7 @@ xp11out_rpos.fields.rollrate = ProtoField.float("xp11out.rpos.rollrate", "Roll R
 xp11out_rpos.fields.pitchrate = ProtoField.float("xp11out.rpos.pitchrate", "Pitch Rate")
 xp11out_rpos.fields.yawrate = ProtoField.float("xp11out.rpos.yawrate", "Yaw Rate")
 
-xp11out_rref = Proto("xp11out.rref", "X-Plane 11 RREF (Dataref by ID)")
+xp11out_rref = Proto("xp11out.rref", "X-Plane 11 RREF (DataRef by ID)")
 xp11out_rref.fields.id = ProtoField.float("xp11out.rref.id", "RREF ID")
 xp11out_rref.fields.value = ProtoField.float("xp11out.rref.value", "Value")
 xp11out_rref.fields.dataref = ProtoField.string("xp11out.rref.dataref","DataRef")
@@ -87,6 +91,12 @@ local function dissectDATA(buffer, pinfo, tree)
       branch:add_le(buffer(offset,4), "[" .. j .. "]:  " .. buffer(offset, 4):le_float() .. "  " .. xp11_DataIdLookup[index][j])
     end
   end
+end
+
+local function dissectDREF(buffer, pinfo, tree)
+  local subtree = tree:add(xp11out_dref, buffer)
+  subtree:add_le(xp11out_dref.fields.value,buffer(0,4))
+  subtree:add(xp11out_dref.fields.dataref, buffer(4))
 end
 
 local function dissectFLIR(buffer, pinfo, tree)
@@ -140,6 +150,7 @@ end
 local subdissectors = {
   BECN = dissectBECN, -- Checked
   DATA = dissectDATA, -- Checked
+  DREF = dissectDREF,
   FLIR = dissectFLIR, -- Checked
   RADR = dissectRADR, -- Checked
   RPOS = dissectRPOS, -- Checked

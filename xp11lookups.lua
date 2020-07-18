@@ -56,6 +56,13 @@ xp11_BeaconTypeLookup = {
   [3] = "IOS"
 }
 
+xp11_EngineModeLookup = {
+    [0] = "Feather",
+    [1] = "Normal",
+    [2] = "Beta",
+    [3] = "Reverse"
+}
+
 xp11_MachineTypeLookup = {
   [0] = "Multiplayer1",
   [1] = "Multiplayer2",
