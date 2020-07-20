@@ -61,7 +61,7 @@ xp11out_rpos.fields.pitchrate = ProtoField.float("xp11out.rpos.pitchrate", "Pitc
 xp11out_rpos.fields.yawrate = ProtoField.float("xp11out.rpos.yawrate", "Yaw Rate")
 
 xp11out_rref = Proto("xp11out.rref", "X-Plane 11 RREF (DataRef by ID)")
-xp11out_rref.fields.id = ProtoField.float("xp11out.rref.id", "RREF ID")
+xp11out_rref.fields.id = ProtoField.int32("xp11out.rref.id", "RREF ID")
 xp11out_rref.fields.value = ProtoField.float("xp11out.rref.value", "Value")
 xp11out_rref.fields.dataref = ProtoField.string("xp11out.rref.dataref","DataRef")
 
@@ -150,7 +150,7 @@ end
 local subdissectors = {
   BECN = dissectBECN, -- Checked
   DATA = dissectDATA, -- Checked
-  DREF = dissectDREF,
+  DREF = dissectDREF, -- Checked
   FLIR = dissectFLIR, -- Checked
   RADR = dissectRADR, -- Checked
   RPOS = dissectRPOS, -- Checked
@@ -160,15 +160,22 @@ local subdissectors = {
 function xp11out.dissector(buffer, pinfo, tree)
   local headerbytes = buffer(0, 4)
   local header = headerbytes:string()
-  pinfo.cols.protocol = "xp11out (" .. header .. ")"
-  local subtree = tree:add(xp11out, buffer(), "X-Plane 11, Header:", header)
-  subtree:add(xp11out.fields.header, headerbytes)
-  local db = buffer(5)
-  subtree:add(db, "[Packet Length: " .. db:len() .. "]")
-  subdissectors[header](db, pinfo, tree)
+  if ((pinfo.src_port == 49001 or pinfo.src_port == 49002 or pinfo.src_port == 49707) and subdissectors[header] ~= nil) then
+    pinfo.cols.protocol = "xp11out (" .. header .. ")"
+    local subtree = tree:add(xp11out, buffer(), "X-Plane 11, Header:", header)
+    subtree:add(xp11out.fields.header, headerbytes)
+    local db = buffer(5)
+    subtree:add(db, "[Packet Length: " .. db:len() .. "]")
+    subdissectors[header](db, pinfo, tree)
+    return true
+  else
+    return false
+  end
 end
 
-ut = DissectorTable.get("udp.port")
-ut:add(49001, xp11out); -- Default value - must match X-Plane->Settings->Network->UDP Ports->Port we send from (legacy)
-ut:add(49002, xp11out); -- FLIR is emitted from 49002
-ut:add(49707, xp11out); -- BECN is multicast to 239.255.1.1:49707
+xp11out:register_heuristic("udp",  xp11out.dissector)
+
+-- ut = DissectorTable.get("udp.port")
+-- ut:add(49001, xp11out); -- Default value - must match X-Plane->Settings->Network->UDP Ports->Port we send from (legacy)
+-- ut:add(49002, xp11out); -- FLIR is emitted from 49002
+-- ut:add(49707, xp11out); -- BECN is multicast to 239.255.1.1:49707

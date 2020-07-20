@@ -128,7 +128,7 @@ xp11in_rpos = Proto("xp11in.rpos","X-Plane 11 RPOS (Request RPOS packets)")
 xp11in_rpos.fields.frequency = ProtoField.string("xp11in.rpos.frequency","Frequency")
 
 xp11in_rref = Proto("xp11in.rref", "X-Plane 11 RREF (Request/Receive DataRef/s by ID)")
-xp11in_rref.fields.id = ProtoField.float("xp11in.rref.id", "RREF ID")
+xp11in_rref.fields.id = ProtoField.int32("xp11in.rref.id", "RREF ID")
 xp11in_rref.fields.value = ProtoField.float("xp11in.rref.value", "Value")
 xp11in_rref.fields.dataref = ProtoField.string("xp11in.rref.dataref","DataRef")
 
@@ -440,13 +440,20 @@ local subdissectors = {
 function xp11in.dissector(buffer, pinfo, tree)
   local headerbytes = buffer(0, 4)
   local header = headerbytes:string()
-  pinfo.cols.protocol = "xp11in (" .. header .. ")"
-  local subtree = tree:add(xp11in, buffer(), "X-Plane 11, Header:", header)
-  subtree:add(xp11in.fields.header, headerbytes)
-  local db = buffer(5)
-  subtree:add(db, "[Packet Length: " .. db:len() .. "]")
-  subdissectors[header](db, pinfo, tree)
+  if (pinfo.dst_port == 49000 and subdissectors[header] ~= nil) then
+    pinfo.cols.protocol = "xp11in (" .. header .. ")"
+    local subtree = tree:add(xp11in, buffer(), "X-Plane 11, Header:", header)
+    subtree:add(xp11in.fields.header, headerbytes)
+    local db = buffer(5)
+    subtree:add(db, "[Packet Length: " .. db:len() .. "]")
+    subdissectors[header](db, pinfo, tree)
+    return true
+  else
+    return false
+  end
 end
 
-ut = DissectorTable.get("udp.port")
-ut:add(49000, xp11in); -- Default value - must match X-Plane->Settings->Network->UDP Ports->Port we receive on (legacy)
+xp11in:register_heuristic("udp",  xp11in.dissector)
+
+-- ut = DissectorTable.get("udp.port")
+-- ut:add(49000, xp11in); -- Default value - must match X-Plane->Settings->Network->UDP Ports->Port we receive on (legacy)
