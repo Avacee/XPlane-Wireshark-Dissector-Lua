@@ -252,11 +252,11 @@ local function dissectFLIR(buffer, pinfo, tree)
 end
 
 local function dissectISE4(buffer, pinfo, tree)
-  local subtree = tree:add(xp11in_ise, buffer)
-  subtree:add_le(xp11in_ise.fields.machinetype,buffer(0,4)):append_text("   " .. xp11_MachineTypeLookup[buffer(0,4):le_int()])
-  subtree:add_le(xp11in_ise.fields.address, buffer(4,16))
-  subtree:add_le(xp11in_ise.fields.port, buffer(20,8))
-  subtree:add_le(xp11in_ise.fields.useip, buffer(28,4))
+  local subtree = tree:add(xp11in_ise4, buffer)
+  subtree:add_le(xp11in_ise4.fields.machinetype,buffer(0,4)):append_text("   " .. xp11_MachineTypeLookup[buffer(0,4):le_int()])
+  subtree:add_le(xp11in_ise4.fields.address, buffer(4,16))
+  subtree:add_le(xp11in_ise4.fields.port, buffer(20,8))
+  subtree:add_le(xp11in_ise4.fields.useip, buffer(28,4))
 end
 
 local function dissectISE6(buffer, pinfo, tree)
@@ -427,7 +427,7 @@ local subdissectors = {
   RESE = dissectRESE, -- Checked
   RPOS = dissectRPOS, -- Checked
   RREF = dissectRREF, -- Checked
-  SHUT = dissectSHUT, -- Checked (Note: doesn't show up as shutdown is in progress before Wireshark has time to show it)
+  SHUT = dissectSHUT, -- Checked (Note: doesn't show up wireshark as shutdown is in progress before Wireshark has time to show it :p)
   SIMO = dissectSIMO, -- Checked
   SOUN = dissectSOUN, -- Checked
   SSND = dissectSSND, -- No way to check if audio stops looping as LSND doesn't appear to work.
