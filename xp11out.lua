@@ -10,7 +10,7 @@ set_plugin_info(xp11out_info)
 
 --local d = require('debug')
 require "xp11lookups"
-require "xp11Datalookups"
+require "xp11DATAlookups"
 
 xp11out = Proto("xp11out","X-Plane 11 (Out)")
 xp11out.fields.header= ProtoField.string("xp11out.header", "Header")
