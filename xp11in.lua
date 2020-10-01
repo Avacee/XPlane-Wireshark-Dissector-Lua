@@ -1,6 +1,6 @@
 local xp11in_info = 
 {
-    version = "1.0.1",
+    version = "1.0.2",
     author = "Avacee",
     description = "This plugin parses UDP packets inbound to X-Plane 11.",
     repository = "https://github.com/avacee/xp11-Lua-Dissector"
@@ -10,6 +10,7 @@ set_plugin_info(xp11in_info)
 
 --local d = require('debug')
 require "xp11lookups"
+require "xp11DATAlookups"
 
 xp11in = Proto("xp11in","X-Plane 11 (In)")
 xp11in.fields.header= ProtoField.string("xp11in.header", "Header")
