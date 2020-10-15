@@ -23,6 +23,7 @@ xp11out_becn.fields.version = ProtoField.int32("xp11out.becn.version", "Version 
 xp11out_becn.fields.role = ProtoField.uint32("xp11out.becn.role", "Role")
 xp11out_becn.fields.port = ProtoField.uint16("xp11out.becn.port", "Port")
 xp11out_becn.fields.name = ProtoField.stringz("xp11out.becn.name", "Computer Name")
+xp11out_becn.fields.newport = ProtoField.uint16("xp11out.becn.newport", "New Port")
 
 xp11out_data = Proto("xp11out.data", "X-Plane 11 DATA (Data Output)")
 xp11out_data.fields.id = ProtoField.float("xp11out.data.id","ID")
@@ -68,12 +69,16 @@ xp11out_rref.fields.dataref = ProtoField.string("xp11out.rref.dataref","DataRef"
 local function dissectBECN(buffer, pinfo, tree)
   local subtree = tree:add(xp11out_becn, buffer)
   subtree:add_le(xp11out_becn.fields.major,buffer(0,1))
-  subtree:add_le(xp11out_becn.fields.minor ,buffer(1,1))
+  local minor = buffer(1,1):le_int()
+  subtree:add_le(xp11out_becn.fields.minor , minor)
   subtree:add_le(xp11out_becn.fields.appid ,buffer(2,4))
   subtree:add_le(xp11out_becn.fields.version ,buffer(6,4))
   subtree:add_le(xp11out_becn.fields.role ,buffer(10,4)):append_text("   " .. xp11_BeaconTypeLookup[buffer(10,4):le_int()])
   subtree:add_le(xp11out_becn.fields.port ,buffer(14,2))
   subtree:add_le(xp11out_becn.fields.name ,buffer(16,buffer:len()-16))
+  if minor == 2 then
+    subtree:add_le(xp11out_becn.fields.newport ,buffer(buffer:len()-2,2))
+  end    
 end
 
 local function dissectDATA(buffer, pinfo, tree)
