@@ -130,7 +130,7 @@ for i = 0, 138 do
   end
 end
 
-xplane_DataIdLookup[0][0] = "Frame Rate"
+xplane_DataIdLookup[0][0] = "Frame Rate Info"
 xplane_DataIdLookup[0][1] = "Actual Frame Rate"
 xplane_DataIdLookup[0][2] = "Sim Frame Rate"
 xplane_DataIdLookup[0][3] = "" --Unused
@@ -1146,7 +1146,7 @@ xplane.fields.cmnd_header = ProtoField.string("xplane.cmnd","Header")
 xplane.fields.cmnd_command = ProtoField.string("xplane.cmnd.command","Command")
 
 xplane.fields.data_header = ProtoField.string("xplane.data","Header")
-xplane.fields.data_id = ProtoField.float("xplane.data.id","ID")
+xplane.fields.data_id = ProtoField.int32("xplane.data.id","ID")
 xplane.fields.data_value = ProtoField.float("xplane.data.value","Value")
 
 xplane.fields.dcoc_header = ProtoField.string("xplane.dcoc","Header")
@@ -1403,6 +1403,7 @@ local function dissectDATA(buffer, pinfo, tree)
             desc = "Unknown - " .. index
         end
         local branch = tree:add(tvb_content(i*36,36), "ID:  " .. index .. "  " .. desc)
+        branch:add_le(xplane.fields.data_id,tvb_content(i*36,4)):append_text("  " .. desc)
         for j=1,8,1 do
             local offset = (i*36) + j*4
             branch:add_le(tvb_content(offset,4), "[" .. j .. "]:  " .. tvb_content(offset, 4):le_float() .. "  " .. xplane_DataIdLookup[index][j])
