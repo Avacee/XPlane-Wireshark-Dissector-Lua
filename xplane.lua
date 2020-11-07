@@ -8,11 +8,12 @@ local xplane_info =
 
 set_plugin_info(xplane_info)
 
---local d = require('debug')
+local d = require('debug')
 
 xplane = Proto("xplane","X-Plane")
 
 xplane.prefs.becn_port = Pref.uint("BECN Port",49707," X-Plane's BECN port")
+xplane.prefs.controlpad_port = Pref.uint("Control Pad Port",48003," Port for X-Plane's Control Pad app. The ACFN packets sent to this port will not be dissected.")
 
 local VALS_StartType = {
   [5] = "RepeatLast",
@@ -1299,12 +1300,6 @@ xplane.fields.vehx_pitch = ProtoField.float("xplane.vehx.pitch","Pitch")
 xplane.fields.vehx_roll = ProtoField.float("xplane.vehx.roll","Roll")
 
 local function dissectACFN(buffer, pinfo, tree)
-    if buffer:len() ~= 165 then
-        return false
-    end
-    if pinfo.dest_port == 48003 then 
-        return false
-    end
     
     pinfo.cols.info = "ACFN - Set Aircraft"
     local tvb_content = buffer(5)
@@ -1317,9 +1312,6 @@ local function dissectACFN(buffer, pinfo, tree)
 end
 
 local function dissectACPR(buffer, pinfo, tree)
-    if buffer:len() ~= 229 then
-        return false
-    end
 
     pinfo.cols.info = "ACPR - Aircraft Start Position"
     local tvb_content = buffer(5)
@@ -1342,9 +1334,6 @@ local function dissectACPR(buffer, pinfo, tree)
 end
 
 local function dissectALRT(buffer, pinfo, tree)
-    if buffer:len() ~= 965 then
-        return false
-    end
 
     pinfo.cols.info = "ALRT - Display Alert"
     local tvb_content = buffer(5)
@@ -1359,10 +1348,6 @@ end
 
 local function dissectBECN(buffer, pinfo, tree)
     
-    if pinfo.dst_port ~= xplane.prefs.becn_port then
-        return false
-    end
-
     pinfo.cols.info = "BECN - Beacon Packet"
     local tvb_content = buffer(5)
     local major = tvb_content(0,1):le_int()
@@ -1392,7 +1377,7 @@ local function dissectCMND(buffer, pinfo, tree)
 end
 
 local function dissectDATA(buffer, pinfo, tree)
-    pinfo.cols.info = "DATA - Set/Receive Data struct(s)"
+    pinfo.cols.info = "DATA - Send/Receive Data struct(s)"
     local tvb_content = buffer(5)
     local count = tvb_content:len() / 36
     tree:add(xplane.fields.data_header, buffer(0,4)):append_text(" .. Count = " .. count)
@@ -1414,9 +1399,6 @@ local function dissectDATA(buffer, pinfo, tree)
 end
 
 local function dissectDCOC(buffer, pinfo, tree)
-    if (buffer:len()-5) % 4 ~= 0 then
-        return false
-    end
   
     pinfo.cols.info = "DCOC - Enable Cockpit Data Output"
     local tvb_content = buffer(5)
@@ -1444,9 +1426,6 @@ local function dissectDREF(buffer, pinfo, tree)
 end
 
 local function dissectDSEL(buffer, pinfo, tree)
-    if (buffer:len()-5) % 4 ~= 0 then
-        return false
-    end
 
     pinfo.cols.info = "DSEL - Disable UDP Data Output"
     local tvb_content = buffer(5)
@@ -1683,10 +1662,10 @@ local function dissectRPOS_OUT(buffer, pinfo, tree)
 end
 
 local function dissectRPOS(buffer, pinfo, tree)
-    if buffer:len() ~= 69 then
-        return dissectRPOS_IN(buffer,pinfo,tree)
-    else
+    if buffer:len() == 69 then
         return dissectRPOS_OUT(buffer,pinfo,tree)
+    else
+        return dissectRPOS_IN(buffer,pinfo,tree)
     end
 end
 
@@ -1839,20 +1818,51 @@ local subdissectors = {
     VEHX = dissectVEHX, -- Checked
 }
 
+local function ValidatePacket(buffer, pinfo)
+
+    local header = buffer(0, 4):string()
+    if subdissectors[header] == nil then
+        return false
+    end
+    if header == "ACFN" and (buffer:len() ~= 165 or pinfo.dst_port == xplane.prefs.controlpad_port) then
+        return false
+    end
+    if header == "ACPR" and buffer:len() ~= 229 then
+        return false
+    end
+    if header == "ALRT" and buffer:len() ~= 965 then
+        return false
+    end
+    if header == "BECN" and pinfo.dst_port ~= xplane.prefs.becn_port then
+        return false
+    end
+    if header == "DATA" and ((buffer:len() - 5) % 36 ~=0) then
+        return false
+    end
+    if (header == "DCOC" or header == "DSEL" or header == "UCOC" or header == "USEL") and ((buffer:len()-5) % 4 ~= 0) then
+        return false
+    end
+    if header == "DREF" and buffer:len() ~= 509 then
+        return false
+    end
+
+    return true
+end
+
 function xplane.dissector(buffer, pinfo, tree)
 
     if buffer:len() <= 5 then
         return false
     end
 
-    local header = buffer(0, 4):string()
-    if subdissectors[header] ~= nil then
-        pinfo.cols.protocol = "xplane." .. header:lower()
-        local subtree = tree:add(xplane, buffer(), "X-Plane (" .. header .. ") Packet Length " .. buffer:len())
-        return subdissectors[header](buffer, pinfo, subtree)
-    else
+    if ValidatePacket(buffer, pinfo) == false then
         return false
     end
+
+    local header = buffer(0, 4):string()
+    pinfo.cols.protocol = "xplane." .. header:lower()
+    local subtree = tree:add(xplane, buffer(), "X-Plane (" .. header .. ") Packet Length " .. buffer:len())
+    return subdissectors[header](buffer, pinfo, subtree)
 end
 
 xplane:register_heuristic("udp",  xplane.dissector)
