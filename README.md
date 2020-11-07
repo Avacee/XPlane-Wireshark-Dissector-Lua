@@ -6,10 +6,10 @@ To locate this folder in Wireshark goto Help -> About -> Folders Tab.\
 To check if the script is loaded goto Help -> About -> Plugins. The Type will be "lua script"\
 Ctrl + Shift + L will reload Lua scripts without needing to restart.
 
-The proto declaration is "xplane" and the protofields have been added using the format xplane.$header$.$element".
-So to view only BECN packets the display filter will be "xplane.becn"
-Conversely to see all packet except BECN (as there are so many) filter on "xplane && !xplane.becn"
-To only see those **DATA** packets with an index of 0 (Frame Rate info) filter on "xplane.data.id == 0"
+The proto declaration is "xplane" and the protofields have been added using the format xplane.$header$.$element".  
+So to view only BECN packets the display filter will be "xplane.becn"  
+Conversely to see all packet except BECN (as there are so many) filter on "xplane && !xplane.becn"  
+To only see those **DATA** packets with an index of 0 (Frame Rate info) filter on "xplane.data.id == 0"  
 
 There is now a Preference for the **BECN** port number (Default 49707)
 
