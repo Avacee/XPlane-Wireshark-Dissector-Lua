@@ -8,7 +8,7 @@ local xplane_info =
 
 set_plugin_info(xplane_info)
 
-local d = require('debug')
+-- local d = require('debug')
 
 xplane = Proto("xplane","X-Plane")
 
@@ -1140,14 +1140,14 @@ xplane.fields.becn_appid = ProtoField.int32("xplane.becn.appid", "Host ID")
 xplane.fields.becn_version = ProtoField.int32("xplane.becn.version", "Version Number")
 xplane.fields.becn_role = ProtoField.uint32("xplane.becn.role", "Role", base.DEC, VALS_BECN_MachineRole)
 xplane.fields.becn_port = ProtoField.uint16("xplane.becn.port", "Port")
-xplane.fields.becn_name = ProtoField.string("xplane.becn.name", "Computer Name")
+xplane.fields.becn_name = ProtoField.stringz("xplane.becn.name", "Computer Name")
 xplane.fields.becn_newport = ProtoField.uint16("xplane.becn.newport", "New Port")
 
 xplane.fields.cmnd_header = ProtoField.string("xplane.cmnd","Header")
 xplane.fields.cmnd_command = ProtoField.string("xplane.cmnd.command","Command")
 
 xplane.fields.data_header = ProtoField.string("xplane.data","Header")
-xplane.fields.data_id = ProtoField.int32("xplane.data.id","ID")
+xplane.fields.data_index = ProtoField.int32("xplane.data.index","Index")
 xplane.fields.data_value = ProtoField.float("xplane.data.value","Value")
 
 xplane.fields.dcoc_header = ProtoField.string("xplane.dcoc","Header")
@@ -1387,8 +1387,8 @@ local function dissectDATA(buffer, pinfo, tree)
         if desc == nil then
             desc = "Unknown - " .. index
         end
-        local branch = tree:add(tvb_content(i*36,36), "ID:  " .. index .. "  " .. desc)
-        branch:add_le(xplane.fields.data_id,tvb_content(i*36,4)):append_text("  " .. desc)
+        local branch = tree:add(tvb_content(i*36,36), "Index:  " .. index .. "  " .. desc)
+        branch:add_le(xplane.fields.data_index,tvb_content(i*36,4)):append_text("  " .. desc)
         for j=1,8,1 do
             local offset = (i*36) + j*4
             branch:add_le(tvb_content(offset,4), "[" .. j .. "]:  " .. tvb_content(offset, 4):le_float() .. "  " .. xplane_DataIdLookup[index][j])
@@ -1851,7 +1851,7 @@ end
 
 function xplane.dissector(buffer, pinfo, tree)
 
-    if buffer:len() <= 5 then
+    if buffer:len() < 5 then
         return false
     end
 
