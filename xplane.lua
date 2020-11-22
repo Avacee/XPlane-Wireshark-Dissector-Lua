@@ -13,7 +13,6 @@ set_plugin_info(xplane_info)
 xplane = Proto("xplane","X-Plane")
 
 xplane.prefs.becn_port = Pref.uint("BECN Port",49707," X-Plane's BECN port")
-xplane.prefs.controlpad_port = Pref.uint("Control Pad Port",48003," Port for X-Plane's Control Pad app. The ACFN packets sent to this port will not be dissected.")
 
 local VALS_StartType = {
   [5] = "RepeatLast",
@@ -1199,6 +1198,7 @@ xplane.fields.nrec_navaidcode = ProtoField.string("xplane.nrec.navaidcode","Nav 
 
 xplane.fields.objl_header = ProtoField.string("xplane.objl","Header")
 xplane.fields.objl_index = ProtoField.int32("xplane.objl.index","Index")
+xplane.fields.objl_padding1 = ProtoField.bytes("xplane.objl.padding1","Padding 1")
 xplane.fields.objl_latitude = ProtoField.double("xplane.objl.latitude","Latitude")
 xplane.fields.objl_longitude = ProtoField.double("xplane.objl.longitude","Longitude")
 xplane.fields.objl_elevation = ProtoField.double("xplane.objl.elevation","Elevation")
@@ -1207,6 +1207,7 @@ xplane.fields.objl_theta = ProtoField.float("xplane.objl.theta","Pitch")
 xplane.fields.objl_phi = ProtoField.float("xplane.objl.phi","Roll")
 xplane.fields.objl_onground = ProtoField.int32("xplane.objl.onground","Is On Ground")
 xplane.fields.objl_smokesize = ProtoField.float("xplane.objl.smokesize","Smoke Size")
+xplane.fields.objl_padding2 = ProtoField.bytes("xplane.objl.padding2","Padding 2")
 
 xplane.fields.objn_header = ProtoField.string("xplane.objn","Header")
 xplane.fields.objn_index = ProtoField.int32("xplane.objn.index","Index")
@@ -1313,7 +1314,7 @@ end
 
 local function dissectACPR(buffer, pinfo, tree)
 
-    pinfo.cols.info = "ACPR - Aircraft Start Position"
+    pinfo.cols.info = "ACPR - Load and Position Aircraft"
     local tvb_content = buffer(5)
     tree:add(xplane.fields.acpr_header, buffer(0,4))
     tree:add_le(xplane.fields.acpr_index,tvb_content(0,4))
@@ -1412,10 +1413,6 @@ local function dissectDCOC(buffer, pinfo, tree)
 end
 
 local function dissectDREF(buffer, pinfo, tree)
-    if buffer:len() ~= 509 then
-        return false
-    end
-
     pinfo.cols.info = "DREF - Send/Receive Dataref"
     local tvb_content = buffer(5)
     tree:add(xplane.fields.dref_header, buffer(0,4))
@@ -1426,7 +1423,6 @@ local function dissectDREF(buffer, pinfo, tree)
 end
 
 local function dissectDSEL(buffer, pinfo, tree)
-
     pinfo.cols.info = "DSEL - Disable UDP Data Output"
     local tvb_content = buffer(5)
     local count = tvb_content:len() / 4
@@ -1464,7 +1460,7 @@ local function dissectFLIR_OUT(buffer, pinfo, tree)
     tree:add_le(xplane.fields.flir_width,tvb_content(2,2))
     tree:add_le(xplane.fields.flir_frameindex,tvb_content(4,1))
     tree:add_le(xplane.fields.flir_framecount,tvb_content(5,1))
-    --tree:add_le(xplane.fields.flir_imagedata,buffer(6,buffer:len()-6)
+    --tree:add_le(xplane.fields.flir_imagedata,buffer(6)
     return true
 end
 
@@ -1501,8 +1497,7 @@ local function dissectISE6(buffer, pinfo, tree)
 end
 
 local function dissectLSND(buffer, pinfo, tree)
-    
-pinfo.cols.info = "LSND - Starting looping a sound"
+	pinfo.cols.info = "LSND - Start looping a sound"
     local tvb_content = buffer(5)
     tree:add(xplane.fields.lsnd_header, buffer(0,4))
     tree:add_le(xplane.fields.lsnd_index,tvb_content(0,4))
@@ -1523,8 +1518,7 @@ local function dissectNFAL(buffer, pinfo, tree)
 end
 
 local function dissectNREC(buffer, pinfo, tree)
-    
-pinfo.cols.info = "NREC - Recover a navaid"
+	pinfo.cols.info = "NREC - Recover a navaid"
     local tvb_content = buffer(5)
     tree:add(xplane.fields.nrec_header, buffer(0,4))
     tree:add(xplane.fields.nrec_navaidcode, tvb_content)
@@ -1535,15 +1529,17 @@ local function dissectOBJL(buffer, pinfo, tree)
     pinfo.cols.info = "OBJL - Position an object"
     local tvb_content = buffer(5)
     tree:add(xplane.fields.objl_header, buffer(0,4))
-    tree:add_le(xplane.fields.objl_index ,tvb_content(0,4))
-    tree:add_le(xplane.fields.objl_latitude,tvb_content(4,8))
-    tree:add_le(xplane.fields.objl_longitude ,tvb_content(12,8))
-    tree:add_le(xplane.fields.objl_elevation ,tvb_content(20,8))
-    tree:add_le(xplane.fields.objl_psi ,tvb_content(28,4))
-    tree:add_le(xplane.fields.objl_theta ,tvb_content(32,4))
-    tree:add_le(xplane.fields.objl_phi ,tvb_content(36,4))
-    tree:add_le(xplane.fields.objl_onground ,tvb_content(40,4))
-    tree:add_le(xplane.fields.objl_smokesize ,tvb_content(44,4))
+    tree:add_le(xplane.fields.objl_index 		,tvb_content(0,4 ))
+    tree:add_le(xplane.fields.objl_padding1		,tvb_content(4,4 ))
+    tree:add_le(xplane.fields.objl_latitude		,tvb_content(8,8 ))
+    tree:add_le(xplane.fields.objl_longitude 	,tvb_content(16,8))
+    tree:add_le(xplane.fields.objl_elevation 	,tvb_content(24,8))
+    tree:add_le(xplane.fields.objl_psi 			,tvb_content(32,4))
+    tree:add_le(xplane.fields.objl_theta 		,tvb_content(36,4))
+    tree:add_le(xplane.fields.objl_phi 			,tvb_content(40,4))
+    tree:add_le(xplane.fields.objl_onground 	,tvb_content(44,4))
+    tree:add_le(xplane.fields.objl_smokesize 	,tvb_content(48,4))
+    tree:add_le(xplane.fields.objl_padding2		,tvb_content(52,4))
 
     return true
 end
@@ -1559,7 +1555,7 @@ local function dissectOBJN(buffer, pinfo, tree)
 end
 
 local function dissectPREL(buffer, pinfo, tree)
-    pinfo.cols.info = "PREL - Load and Position Aircraft)"
+    pinfo.cols.info = "PREL - Position Aircraft)"
     local tvb_content = buffer(5)
     tree:add(xplane.fields.prel_header, buffer(0,4))
     tree:add_le(xplane.fields.prel_starttype,tvb_content(0,4)) 
@@ -1721,8 +1717,7 @@ local function dissectSIMO(buffer, pinfo, tree)
 end
 
 local function dissectSOUN(buffer, pinfo, tree)
-    
-pinfo.cols.info = "SOUN - Play a Sound Once"
+	pinfo.cols.info = "SOUN - Play a Sound Once"
     local tvb_content = buffer(5)
     tree:add(xplane.fields.soun_header, buffer(0,4))
     tree:add_le(xplane.fields.soun_speed, tvb_content(0,4))
