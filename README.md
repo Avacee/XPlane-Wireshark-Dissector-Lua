@@ -1,6 +1,8 @@
 # XPlane-Wireshark-Dissector-LUA
 **A Wireshark Dissector for X-Plane UDP Packets written in LUA**
 
+I recommend using my C Plugin which can be found at https://github.com/Avacee/XPlane-Wireshark-Dissector-C as it is considerably faster and will receieve future development focus.
+
 To install simply download and copy xplane.lua into Wireshark's "Personal Lua Plugins" folder or "Global Lua Plugins" folder.\
 To locate this folder in Wireshark goto Help -> About -> Folders Tab.\
 To check if the script is loaded goto Help -> About -> Plugins. The Type will be "lua script"\
